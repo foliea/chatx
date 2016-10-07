@@ -5,6 +5,8 @@ let express = require('express'),
   http = require('http').Server(app),
   io = require('socket.io')(http);
 
+require('./chat')(io);
+
 app
 .use(express.static('public'))
 .listen(3000, () => {
