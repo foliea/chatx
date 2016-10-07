@@ -1,31 +1,94 @@
 (function(fn){var d=document;(d.readyState=='loading')?d.addEventListener('DOMContentLoaded',fn):fn();})(function(){
-  var joinButton = document.getElementById('join-room'),
-       roomInput = document.querySelector('input[name="room"]');
-
-  joinButton.disabled = true;
-  roomInput.disabled  = true;
-
-  let client = io.connect();
-
-  client.on('connect', function() {
-    roomInput.disabled = false;
-  });
-
-  client.on('active-room', function(roomName) {
-    document.getElementById('active-room').innerHTML = roomName;
-  });
-
-  joinButton.addEventListener('click', function() {
-    let roomName = roomInput.value;
-
-    client.emit('join-room', roomName);
-  });
-
-  roomInput.addEventListener('input', function(input) {
-    if (roomInput.value == '') {
-      joinButton.disabled = true;
-    } else {
-      joinButton.disabled = false;
+  var selectors = {
+    button: {
+      join: function() {
+        return document.getElementById('join-room');
+      },
+      send: function() {
+        return document.getElementById('send');
+      }
+    },
+    input: {
+      room: function() {
+        return document.querySelector('input[name="room"]');
+      },
+      message: function() {
+        return document.querySelector('textarea[name="message"]');
+      }
+    },
+    block: {
+      messages: function() {
+        return document.getElementById('messages');
+      },
+      activeRoom: function() {
+        return document.getElementById('active-room');
+      }
     }
-  });
+  };
+
+  function UI(selectors, client) {
+    this.selectors = selectors;
+    this.client    = client;
+  }
+
+  UI.prototype.initialize = function() {
+    var self = this;
+
+    this.selectors.button.join().disabled = true;
+    this.selectors.button.send().disabled = true;
+
+    this.selectors.input.room().disabled  = true;
+
+    this.selectors.button.join().addEventListener('click', function() {
+      self.selectors.block.messages().innerHTML = '';
+
+      self.client.emit('join-room', self.selectors.input.room().value);
+    });
+
+    this.selectors.button.send().addEventListener('click', function() {
+      var message = self.selectors.input.message().value,
+        roomName  = self.selectors.block.activeRoom().innerHTML;
+
+      self.client.emit('message', message);
+    });
+
+    this.selectors.input.room().addEventListener('input', function(input) {
+      if (self.selectors.input.room().value == '') {
+        self.selectors.button.join().disabled = true;
+      } else {
+        self.selectors.button.join().disabled = false;
+      }
+    });
+
+    this.client.on('connect', function() {
+      self.activate();
+    });
+
+    this.client.on('active-room', function(roomName) {
+      self.loadRoom(roomName);
+    });
+    this.client.on('message', function(content) {
+      self.populateChat(content);
+    });
+  }
+
+  UI.prototype.activate = function() {
+    this.selectors.input.room().disabled = false;
+  }
+
+  UI.prototype.populateChat = function(content) {
+    this.selectors.input.message().value = '';
+
+    this.selectors.block.messages().innerHTML += '<span>[' + content.sentAt + '] [' + content.sender + '] ' + content.text + '</span><br>';
+  }
+
+  UI.prototype.loadRoom = function(roomName) {
+    this.selectors.block.activeRoom().innerHTML = roomName;
+
+    this.selectors.button.send().disabled = false;
+  }
+
+  var ui = new UI(selectors, io.connect());
+
+  ui.initialize();
 });
