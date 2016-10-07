@@ -1,0 +1,5 @@
+--recursive
+--timeout 5000
+--reporter spec
+--compilers js:babel-register
+--require test/support.js
