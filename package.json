@@ -1,0 +1,10 @@
+{
+  "name": "ChatX",
+  "version": "0.0.1",
+  "description": "A simple web chat",
+  "dependencies": {
+    "babel-register": "6.16.x",
+    "express": "4.14.x",
+    "socket.io": "1.5.x"
+  }
+}
