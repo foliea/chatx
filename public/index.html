@@ -4,6 +4,15 @@
     <title>ChatX</title>
   </head>
   <body>
-    Welcome on ChatX!
+    <script src="js/socket.io.js"></script>
+    <script src="js/chat.js"></script>
+
+    Welcome on ChatX!<br><br>
+
+    <input type="text" name="room" placeholder="Enter room name"> <button id="join-room" type="button">Join</button>
+
+    <br><br>
+
+    Active room: <b><span id="active-room">None</span></b>
   </body>
 </html>

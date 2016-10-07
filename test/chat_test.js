@@ -26,7 +26,7 @@ describe('Chat', () => {
   });
 
   afterEach(() => {
-     client.disconnect();
+    client.disconnect();
   });
 
   describe('join-room', () => {

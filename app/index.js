@@ -2,13 +2,13 @@
 
 let express = require('express'),
   app = express(),
-  http = require('http').Server(app),
-  io = require('socket.io')(http);
+  server = require('http').Server(app),
+  io = require('socket.io')(server);
 
 require('./chat')(io);
 
-app
-.use(express.static('public'))
-.listen(3000, () => {
+app.use(express.static('public'))
+
+server.listen(3000, () => {
   console.log('listening on *:3000');
 });
