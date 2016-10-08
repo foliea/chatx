@@ -31,7 +31,7 @@ describe('Message', () => {
     });
   });
 
-  describe('#isValid', () => {
+  describe('#isValid()', () => {
     it('returns true', () => {
       expect(message.isValid()).to.be.true;
     });

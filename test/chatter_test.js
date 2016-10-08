@@ -1,6 +1,7 @@
 'use strict';
 
-let Chatter = require('../app/chatter');
+let Room = require('../app/room'),
+  Chatter = require('../app/chatter');
 
 describe('Chatter', () => {
   let chatter;
@@ -17,17 +18,17 @@ describe('Chatter', () => {
     });
   });
 
-  describe('#join', () => {
-    const ROOM = '/b';
+  describe('#join()', () => {
+    let room = new Room('test');
 
     let socketMock;
 
     beforeEach(() => {
       socketMock = sinon.mock(chatter.socket);
 
-      socketMock.expects('join').withArgs(ROOM)
+      socketMock.expects('join').withArgs(room.name)
 
-      socketMock.expects('emit').withArgs('active-room', ROOM)
+      socketMock.expects('emit').withArgs('active-room', room.name)
     });
 
     afterEach(() => {
@@ -38,7 +39,7 @@ describe('Chatter', () => {
       beforeEach(() => {
         socketMock.expects('leave').never();
 
-        chatter.join(ROOM);
+        chatter.join(room);
       });
 
       it('joins the room and emits the room informations', () => {
@@ -46,17 +47,17 @@ describe('Chatter', () => {
       });
 
       it('changes its active room', () => {
-        expect(chatter.activeRoom).to.eq(ROOM);
+        expect(chatter.activeRoom).to.eq(room);
       });
     });
 
     context('when chatter already joined a room', () => {
       beforeEach(() => {
-        chatter.activeRoom = 'test';
+        chatter.activeRoom = new Room('/b');
 
-        socketMock.expects('leave').withArgs(chatter.activeRoom);
+        socketMock.expects('leave').withArgs(chatter.activeRoom.name);
 
-        chatter.join(ROOM);
+        chatter.join(room);
       });
 
       it('leaves the previous active room and joins the new room', () => {
@@ -64,12 +65,12 @@ describe('Chatter', () => {
       });
 
       it('changes its active room', () => {
-        expect(chatter.activeRoom).to.eq(ROOM);
+        expect(chatter.activeRoom).to.eq(room);
       });
     });
   });
 
-  describe('#error', () => {
+  describe('#error()', () => {
     const ERROR = 'Error.'
 
     beforeEach(() => {

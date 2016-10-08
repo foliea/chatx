@@ -20,6 +20,9 @@
       messages: function() {
         return document.getElementById('messages');
       },
+      members: function() {
+        return document.getElementById('members');
+      },
       activeRoom: function() {
         return document.getElementById('active-room');
       }
@@ -73,8 +76,8 @@
       self.activate();
     });
 
-    this.client.on('active-room', function(roomName) {
-      self.loadRoom(roomName);
+    this.client.on('active-room', function(room) {
+      self.loadRoom(room);
     });
     this.client.on('message', function(content) {
       self.populateChat(content);
@@ -91,10 +94,16 @@
     this.selectors.block.messages().innerHTML += '<span>[' + content.sentAt + '] [' + content.sender + '] ' + content.text + '</span><br>';
   }
 
-  UI.prototype.loadRoom = function(roomName) {
-    this.selectors.block.activeRoom().innerHTML = roomName;
+  UI.prototype.loadRoom = function(room) {
+    this.selectors.block.activeRoom().innerHTML = room.name;
 
-    this.activeRoom = roomName;
+    this.activeRoom = room.name;
+
+    this.selectors.block.members().innerHTML = '';
+
+    room.members.forEach(nickname => {
+      this.selectors.block.members().innerHTML += '<li>' + nickname + '</li>'
+    });
   }
 
   var ui = new UI(selectors, io.connect());

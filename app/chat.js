@@ -1,22 +1,51 @@
 'use strict';
 
-let Message = require('./message'),
-  Chatter = require('./chatter');
+let _ = require('lodash'),
+  Message = require('./message'),
+  Chatter = require('./chatter'),
+  Room = require('./room');
 
-module.exports = function(io) {
-  io.on('connection', socket => {
-    let chatter = new Chatter(socket);
+class Chat {
+  constructor(io) {
+    this.io    = io;
+    this.rooms = [];
+  }
+  initialize() {
+    this.io.on('connection', socket => {
+      let chatter = new Chatter(socket);
 
-    socket.on('join-room', roomName => {
-      chatter.join(roomName);
+      socket.on('join-room', roomName => {
+        let room = this.findOrCreate(roomName);
+
+        chatter.join(room);
+      });
+      socket.on('message', content => {
+        let message = new Message(content, chatter);
+
+        if (!message.isValid()) {
+          return chatter.error('Message must be present');
+        }
+        chatter.write(message);
+      });
+      socket.on('disconnect', ()=> {
+        chatter.leave();
+      });
     });
-    socket.on('message', content => {
-      let message = new Message(content, chatter);
-
-      if (!message.isValid()) {
-        return chatter.error('Message must be present');
-      }
-      io.to(chatter.activeRoom).emit('message', message);
+  }
+  findOrCreate(roomName) {
+    let index = _.findIndex(this.rooms, room => {
+      return room.name === roomName;
     });
-  });
+
+    return index == -1 ? this.create(roomName) : this.rooms[index];
+  }
+  create(roomName) {
+    let room = new Room(this.io, roomName);
+
+    this.rooms.push(room);
+
+    return room;
+  }
 }
+
+module.exports = Chat;

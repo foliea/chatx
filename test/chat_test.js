@@ -31,7 +31,7 @@ describe('Chat', () => {
     client.disconnect();
   });
 
-  describe('join-room', () => {
+  describe('on join-room', () => {
     const ROOM_NAME = 'test';
 
     it('allows clients to join or create a room', done => {
@@ -44,7 +44,7 @@ describe('Chat', () => {
     });
   });
 
-  describe('message', () => {
+  describe('on message', () => {
     beforeEach(done => {
       client.on('active-room', () => {
         done();
