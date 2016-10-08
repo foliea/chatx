@@ -98,14 +98,14 @@
   }
 
   UI.prototype.loadRoom = function(room) {
-    this.selectors.block.activeRoom().innerHTML = this.activeRoom;
+    this.selectors.block.activeRoom().innerHTML = '#' + this.activeRoom;
 
     this.isInARoom = true;
 
     this.selectors.block.members().innerHTML = '';
 
     room.members.forEach(nickname => {
-      this.selectors.block.members().innerHTML += '<li>' + nickname + '</li>'
+      this.selectors.block.members().innerHTML += '<li class="list-group-item">' + nickname + '</li>'
     });
   }
 

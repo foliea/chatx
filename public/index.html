@@ -4,31 +4,57 @@
     <title>ChatX</title>
   </head>
   <body>
-    <script src="js/socket.io.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <script src="http://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+
     <script src="js/chat.js"></script>
 
-    Welcome on ChatX!<br><br>
+    <main role="main">
+      <h2>Welcome on ChatX!</h2>
 
-    <input type="text" name="room" placeholder="Enter room name"> <button id="join-room" type="button">Join</button>
+      <section class="container-fluid">
+        <input type="text" name="room" placeholder="Enter room name"> <button id="join-room" type="button">Join</button>
 
-    <br><br>
-
-    Active room: <b><span id="active-room">None</span></b>
-
-    <br><br>
-
-    Members:
-
-    <br><br>
-
-    <ul id="members"></ul>
-
-    <br><br>
-
-    <div id="messages"></div>
-
-    <br><br>
-
-    <input type="text" name="message" maxlength="280"> <button id="send" type="button">Send</button>
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h3 id="active-room" class="panel-title">None</h3>
+          </div>
+          <div class="panel-body">
+            <div class="col-sm-6 col-md-4">
+              <div class="panel panel-info">
+                <div class="panel-heading">
+                  <h3 id="active-room" class="panel-title">Members</h3>
+                </div>
+                <div class="panel-body">
+                  <ul id="members" class="list-group"></ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-12 col-md-8">
+              <div class="row">
+                <div class="panel panel-default">
+                  <div id="messages" class="panel-body"></div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="input-group">
+                  <input type="text" name="message" maxlength="280" class="form-control" placeholder="Let's chat...">
+                  <span class="input-group-btn">
+                    <button id="send" class="btn btn-default" type="button">Send</button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
   </body>
 </html>
