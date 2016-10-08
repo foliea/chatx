@@ -13,7 +13,7 @@
         return document.querySelector('input[name="room"]');
       },
       message: function() {
-        return document.querySelector('textarea[name="message"]');
+        return document.querySelector('input[name="message"]');
       }
     },
     block: {

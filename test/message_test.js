@@ -1,13 +1,16 @@
 'use strict';
 
-let moment = require('moment'),
+let _ = require('lodash'),
+  moment = require('moment'),
   Message = require('../app/Message');
 
 describe('Message', () => {
+  const CHATTER = { nickname: 'JohnSnow' };
+
   let message;
 
   beforeEach(() => {
-    message = new Message('hello', { nickname: 'JohnSnow' });
+    message = new Message('hello', CHATTER);
   });
 
   describe('#sentAt', () => {
@@ -29,6 +32,61 @@ describe('Message', () => {
   });
 
   describe('#isValid', () => {
+    it('returns true', () => {
+      expect(message.isValid()).to.be.true;
+    });
 
+    context('when text is undefined', () => {
+      beforeEach(() => {
+        message = new Message(undefined, CHATTER);
+      });
+
+      it('returns false', () => {
+        expect(message.isValid()).to.be.false;
+      });
+    });
+
+    context('when text is empty', () => {
+      beforeEach(() => {
+        message = new Message('', CHATTER);
+      });
+
+      it('returns false', () => {
+        expect(message.isValid()).to.be.false;
+      });
+    });
+
+    context('when text only contains spaces', () => {
+      beforeEach(() => {
+        message = new Message('      ', CHATTER);
+      });
+
+      it('returns false', () => {
+        expect(message.isValid()).to.be.false;
+      });
+    });
+
+    context('when text only carriage returns', () => {
+      beforeEach(() => {
+        message = new Message('\n\r\n\r', CHATTER);
+      });
+
+      it('returns false', () => {
+        expect(message.isValid()).to.be.false;
+      });
+    });
+
+    context('when text is too long', () => {
+      beforeEach(() => {
+        let text = _.fill(new Array(281), '.').toString();
+
+        message = new Message(text, CHATTER);
+      });
+
+      it('returns false', () => {
+        console.log();
+        expect(message.isValid()).to.be.false;
+      });
+    });
   });
 });
