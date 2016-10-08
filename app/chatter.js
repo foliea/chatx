@@ -1,12 +1,15 @@
 'use strict';
 
+let Chance = require('chance'),
+  chance = new Chance();
+
 const JOIN_ROOM_ERROR = 'Please join a room first';
 
 class Chatter {
   constructor(socket) {
     this.socket     = socket;
-    this.nickname   = socket.id;
     this.id         = socket.id;
+    this.nickname   = chance.name();
     this.activeRoom = null;
   }
   join(room) {

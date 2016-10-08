@@ -18,8 +18,12 @@ describe('Chatter', () => {
   });
 
   describe('#nickname', () => {
-    it('equals its socket id', () => {
-      expect(chatter.nickname).to.eq(chatter.socket.id);
+    it('is a string', () => {
+      expect(chatter.nickname).to.be.a.string;
+    });
+
+    it('is not empty', () => {
+      expect(chatter.nickname.trim()).to.not.be.empty;
     });
   });
 
