@@ -5,6 +5,8 @@ let _ = require('lodash'),
   Chatter = require('./chatter'),
   Room = require('./room');
 
+const INVALID_MESSAGE_ERROR = 'Message must be present.';
+
 class Chat {
   constructor(io) {
     this.io    = io;
@@ -15,20 +17,18 @@ class Chat {
       let chatter = new Chatter(socket);
 
       socket.on('join-room', roomName => {
-        let room = this.findOrCreate(roomName);
-
-        chatter.join(room);
+        chatter.join(this.findOrCreate(roomName));
       });
       socket.on('message', content => {
         let message = new Message(content, chatter);
 
         if (!message.isValid()) {
-          return chatter.error('Message must be present');
+          return chatter.error(INVALID_MESSAGE_ERROR);
         }
         chatter.write(message);
       });
       socket.on('disconnect', ()=> {
-        chatter.leave();
+        if (chatter.isInARoom) { chatter.leave(); }
       });
     });
   }
