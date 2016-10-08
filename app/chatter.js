@@ -1,23 +1,44 @@
 'use strict';
 
+const JOIN_ROOM_ERROR = 'Please join a room first';
+
 class Chatter {
   constructor(socket) {
     this.socket     = socket;
     this.nickname   = socket.id;
+    this.id         = socket.id;
     this.activeRoom = null;
   }
-  join(roomName) {
-    if (this.activeRoom) {
-      this.socket.leave(this.activeRoom);
+  join(room) {
+    if (this.activeRoom) { this.leave() };
+
+    this.activeRoom = room;
+
+    this.socket.join(room.name);
+
+    room.add(this);
+  }
+  leave() {
+    if (!this.activeRoom) {
+      return this.error(JOIN_ROOM_ERROR);
     }
-    this.socket.join(roomName);
+    this.socket.leave(this.activeRoom.name);
 
-    this.activeRoom = roomName;
+    this.activeRoom.remove(this);
 
-    this.socket.emit('active-room', roomName);
+    this.activeRoom = null;
+  }
+  write(message) {
+    if (!this.activeRoom) {
+      return this.error(JOIN_ROOM_ERROR);
+    }
+    this.activeRoom.send(message);
   }
   error(content) {
     this.socket.emit('failure', content);
+  }
+  get isInARoom() {
+    return this.activeRoom !== null;
   }
 }
 

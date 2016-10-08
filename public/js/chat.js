@@ -20,6 +20,9 @@
       messages: function() {
         return document.getElementById('messages');
       },
+      members: function() {
+        return document.getElementById('members');
+      },
       activeRoom: function() {
         return document.getElementById('active-room');
       }
@@ -29,6 +32,7 @@
   function UI(selectors, client) {
     this.selectors  = selectors;
     this.client     = client;
+    this.isInARoom  = true;
     this.activeRoom = null;
   }
 
@@ -43,7 +47,9 @@
     this.selectors.button.join().addEventListener('click', function() {
       self.selectors.block.messages().innerHTML = '';
 
-      self.client.emit('join-room', self.selectors.input.room().value);
+      self.activeRoom = self.selectors.input.room().value;
+
+      self.client.emit('join-room', self.activeRoom);
     });
 
     this.selectors.button.send().addEventListener('click', function() {
@@ -62,7 +68,7 @@
     });
 
     this.selectors.input.message().addEventListener('input', function(input) {
-      if (!self.activeRoom || self.selectors.input.message().value.trim() == '') {
+      if (!self.isInARoom || self.selectors.input.message().value.trim() == '') {
         self.selectors.button.send().disabled = true;
       } else {
         self.selectors.button.send().disabled = false;
@@ -73,8 +79,8 @@
       self.activate();
     });
 
-    this.client.on('active-room', function(roomName) {
-      self.loadRoom(roomName);
+    this.client.on('room-infos', function(room) {
+      self.loadRoom(room);
     });
     this.client.on('message', function(content) {
       self.populateChat(content);
@@ -91,10 +97,16 @@
     this.selectors.block.messages().innerHTML += '<span>[' + content.sentAt + '] [' + content.sender + '] ' + content.text + '</span><br>';
   }
 
-  UI.prototype.loadRoom = function(roomName) {
-    this.selectors.block.activeRoom().innerHTML = roomName;
+  UI.prototype.loadRoom = function(room) {
+    this.selectors.block.activeRoom().innerHTML = this.activeRoom;
 
-    this.activeRoom = roomName;
+    this.isInARoom = true;
+
+    this.selectors.block.members().innerHTML = '';
+
+    room.members.forEach(nickname => {
+      this.selectors.block.members().innerHTML += '<li>' + nickname + '</li>'
+    });
   }
 
   var ui = new UI(selectors, io.connect());

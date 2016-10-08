@@ -3,9 +3,11 @@
 let express = require('express'),
   app = express(),
   server = require('http').Server(app),
-  io = require('socket.io')(server);
+  io = require('socket.io')(server),
+  Chat = require('./chat'),
+  chat = new Chat(io);
 
-require('./chat')(io);
+chat.initialize();
 
 app.use(express.static('public'))
 

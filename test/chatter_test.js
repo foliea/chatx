@@ -11,65 +11,166 @@ describe('Chatter', () => {
     );
   });
 
+  describe('#id', () => {
+    it('equals its socket id', () => {
+      expect(chatter.id).to.eq(chatter.socket.id);
+    });
+  });
+
   describe('#nickname', () => {
     it('equals its socket id', () => {
       expect(chatter.nickname).to.eq(chatter.socket.id);
     });
   });
 
-  describe('#join', () => {
-    const ROOM = '/b';
-
-    let socketMock;
-
-    beforeEach(() => {
-      socketMock = sinon.mock(chatter.socket);
-
-      socketMock.expects('join').withArgs(ROOM)
-
-      socketMock.expects('emit').withArgs('active-room', ROOM)
+  describe('#isInARoom', () => {
+    it('returns false', () => {
+      expect(chatter.isInARoom).to.be.false;
     });
 
-    afterEach(() => {
-      socketMock.restore();
-    });
-
-    context('when chatter is in no room', () => {
-      beforeEach(() => {
-        socketMock.expects('leave').never();
-
-        chatter.join(ROOM);
+    context('when chatter is in a room', ()=> {
+      beforeEach(()=> {
+        chatter.activeRoom = {};
       });
 
-      it('joins the room and emits the room informations', () => {
-        expect(socketMock.verify()).to.be.true;
-      });
-
-      it('changes its active room', () => {
-        expect(chatter.activeRoom).to.eq(ROOM);
-      });
-    });
-
-    context('when chatter already joined a room', () => {
-      beforeEach(() => {
-        chatter.activeRoom = 'test';
-
-        socketMock.expects('leave').withArgs(chatter.activeRoom);
-
-        chatter.join(ROOM);
-      });
-
-      it('leaves the previous active room and joins the new room', () => {
-        expect(socketMock.verify()).to.be.true;
-      });
-
-      it('changes its active room', () => {
-        expect(chatter.activeRoom).to.eq(ROOM);
+      it('returns true', () => {
+        expect(chatter.isInARoom).to.be.true;
       });
     });
   });
 
-  describe('#error', () => {
+  describe('#join()', () => {
+    let room;
+
+    beforeEach(() => {
+      sinon.stub(chatter, 'leave');
+
+      sinon.stub(chatter.socket, 'join');
+
+      room = { name: '/b', add: ()=>{} };
+
+      sinon.stub(room, 'add');
+    });
+
+    context('when chatter was not in a room', ()=> {
+      beforeEach(() => {
+        chatter.join(room);
+      });
+
+      it("doesn't leave the previous room", () => {
+        expect(chatter.leave).to.not.have.been.called;
+      });
+
+      it('joins given room', () => {
+        expect(chatter.socket.join).to.have.been.calledWith(room.name);
+      });
+
+      it('adds itself to given room', () => {
+        expect(room.add).to.have.been.calledWith(chatter);
+      });
+
+      it('sets its active room to given room', ()=> {
+        expect(chatter.activeRoom).to.eq(room);
+      });
+    });
+
+    context('when chatter was in another room', ()=> {
+      beforeEach(() => {
+        chatter.activeRoom = { name: '/c'};
+
+        chatter.join(room);
+      });
+
+      it('leaves the previous room', () => {
+        expect(chatter.leave).to.have.been.called;
+      });
+
+      it('joins given room', () => {
+        expect(chatter.socket.join).to.have.been.calledWith(room.name);
+      });
+
+      it('adds itself to given room', () => {
+        expect(room.add).to.have.been.calledWith(chatter);
+      });
+
+      it('sets its active room to given room', ()=> {
+        expect(chatter.activeRoom).to.eq(room);
+      });
+    });
+  });
+
+  describe('#write()', () => {
+    context('when chatter is in a room', ()=> {
+      let room;
+
+      beforeEach(() => {
+        room = { name: '/c', remove: ()=> {} };
+
+        chatter.activeRoom = room;
+
+        sinon.stub(chatter.socket, 'leave');
+
+        sinon.stub(room, 'remove');
+
+        chatter.leave();
+      });
+
+      it('leaves the room', ()=> {
+        expect(chatter.socket.leave).to.have.been.calledWith(room.name);
+      });
+
+      it('removes itself from the room', ()=> {
+        expect(room.remove).to.have.been.calledWith(chatter);
+      });
+
+      it('reset its active room', ()=> {
+        expect(chatter.activeRoom).to.be.null;
+      });
+    });
+
+    context('when chatter is not in a room', ()=> {
+      beforeEach(() => {
+        sinon.stub(chatter, 'error');
+
+        chatter.leave();
+      });
+
+      it('sends an error to the chatter', () => {
+        expect(chatter.error).to.have.been.calledWith('Please join a room first');
+      });
+    });
+  });
+
+  describe('#write()', () => {
+    context('when chatter is in a room', ()=> {
+      beforeEach(() => {
+        chatter.activeRoom = { name: '/c', send: ()=> {} };
+
+        sinon.stub(chatter.activeRoom, 'send');
+
+        chatter.write('message');
+      });
+
+      it('sends a message to the chatter active room', () => {
+        expect(chatter.activeRoom.send).to.have.been.calledWith('message');
+      });
+    });
+
+    context('when chatter is not in a room', ()=> {
+      beforeEach(() => {
+        sinon.stub(chatter, 'error');
+
+        chatter.write('message');
+      });
+
+      it('sends an error to the chatter', () => {
+        expect(chatter.error).to.have.been.calledWith('Please join a room first');
+      });
+
+    });
+  });
+
+  describe('#error()', () => {
     const ERROR = 'Error.'
 
     beforeEach(() => {
