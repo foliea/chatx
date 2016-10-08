@@ -33,11 +33,10 @@ class Chat {
     });
   }
   findOrCreate(roomName) {
-    let index = _.findIndex(this.rooms, room => {
+    let room = _.find(this.rooms, room => {
       return room.name === roomName;
     });
-
-    return index == -1 ? this.create(roomName) : this.rooms[index];
+    return room ? room : this.create(roomName);
   }
   create(roomName) {
     let room = new Room(this.io, roomName);

@@ -4,31 +4,35 @@ let _ = require('lodash');
 
 class Room {
   constructor(io, name) {
-    this.io      = io;
+    this.channel = io.to(name);
     this.name    = name;
     this.members = [];
   }
   add(chatter) {
+    let member = _.find(this.members, member => {
+      return member.id === chatter.id;
+    });
+
+    if (member) { return; }
+
     this.members.push(chatter);
 
-    this.members = _.uniq(this.members);
-
-    this.io.to(this.name).emit('active-room', this.infos);
+    this.channel.emit('room-infos', this.infos);
   }
   remove(chatter) {
     _.remove(this.members, member => {
-      return member.id == chatter.id;
+      return member.id === chatter.id;
     });
-    this.io.to(this.name).emit('active-room', this.infos);
+    this.channel.emit('room-infos', this.infos);
   }
   send(message) {
-    this.io.to(this.name).emit('message', message);
+    this.channel.emit('message', message);
   }
   get infos() {
     let membersNickname = _.map(this.members, member => {
       return member.nickname;
     });
-    return { name: this.name, members: membersNickname };
+    return { members: membersNickname };
   }
 }
 
