@@ -42,10 +42,6 @@ describe('Chat', () => {
       });
       client.emit('join-room', ROOM_NAME);
     });
-
-    it('leaves the previous active room of a given client', () => {
-
-    });
   });
 
   describe('message', () => {

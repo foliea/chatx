@@ -27,8 +27,9 @@
   };
 
   function UI(selectors, client) {
-    this.selectors = selectors;
-    this.client    = client;
+    this.selectors  = selectors;
+    this.client     = client;
+    this.activeRoom = null;
   }
 
   UI.prototype.initialize = function() {
@@ -60,6 +61,14 @@
       }
     });
 
+    this.selectors.input.message().addEventListener('input', function(input) {
+      if (!self.activeRoom || self.selectors.input.message().value.trim() == '') {
+        self.selectors.button.send().disabled = true;
+      } else {
+        self.selectors.button.send().disabled = false;
+      }
+    });
+
     this.client.on('connect', function() {
       self.activate();
     });
@@ -85,7 +94,7 @@
   UI.prototype.loadRoom = function(roomName) {
     this.selectors.block.activeRoom().innerHTML = roomName;
 
-    this.selectors.button.send().disabled = false;
+    this.activeRoom = roomName;
   }
 
   var ui = new UI(selectors, io.connect());

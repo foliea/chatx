@@ -4,10 +4,10 @@ let _ = require('lodash'),
   moment = require('moment');
 
 class Message {
-  constructor(text, sender) {
+  constructor(text, chatter) {
     this.sentAt = moment();
     this.text   = text;
-    this.sender = sender.nickname;
+    this.sender = chatter.nickname;
   }
   isValid() {
     return !_.isEmpty(this.text);
