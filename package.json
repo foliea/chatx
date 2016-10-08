@@ -2,6 +2,18 @@
   "name": "ChatX",
   "version": "0.0.1",
   "description": "A simple web chat",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha",
+    "start": "node index.js"
+  },
+  "author": "Adrien Folie <folie.adrien@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/foliea/chatx/issues"
+  },
+  "engines": {
+    "node": "5.4.x"
+  },
   "dependencies": {
     "babel-register": "6.16.x",
     "chance": "1.0.x",
