@@ -9,7 +9,7 @@ class Message {
     this.text   = text;
     this.sender = chatter.nickname;
   }
-  isValid() {
+  get isValid() {
     return !_.isUndefined(this.text) && !_.isEmpty(this.text.trim()) &&
       this.text.length <= 280;
   }

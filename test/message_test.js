@@ -31,9 +31,9 @@ describe('Message', () => {
     });
   });
 
-  describe('#isValid()', () => {
+  describe('#isValid', () => {
     it('returns true', () => {
-      expect(message.isValid()).to.be.true;
+      expect(message.isValid).to.be.true;
     });
 
     context('when text is undefined', () => {
@@ -42,7 +42,7 @@ describe('Message', () => {
       });
 
       it('returns false', () => {
-        expect(message.isValid()).to.be.false;
+        expect(message.isValid).to.be.false;
       });
     });
 
@@ -52,7 +52,7 @@ describe('Message', () => {
       });
 
       it('returns false', () => {
-        expect(message.isValid()).to.be.false;
+        expect(message.isValid).to.be.false;
       });
     });
 
@@ -62,7 +62,7 @@ describe('Message', () => {
       });
 
       it('returns false', () => {
-        expect(message.isValid()).to.be.false;
+        expect(message.isValid).to.be.false;
       });
     });
 
@@ -72,7 +72,7 @@ describe('Message', () => {
       });
 
       it('returns false', () => {
-        expect(message.isValid()).to.be.false;
+        expect(message.isValid).to.be.false;
       });
     });
 
@@ -85,7 +85,7 @@ describe('Message', () => {
 
       it('returns false', () => {
         console.log();
-        expect(message.isValid()).to.be.false;
+        expect(message.isValid).to.be.false;
       });
     });
   });

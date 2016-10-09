@@ -84,6 +84,34 @@ describe('Chat', () => {
         client.emit('join-room', ROOM_NAME);
       });
     });
+
+    context('when room is invalid', () => {
+      it("doesn't create a new room", done => {
+        client.on('failure', error => {
+          expect(error).to.not.be.empty;
+
+          done();
+        });
+        client.emit('join-room');
+      });
+    });
+
+    context('when chatter already joined the room', () => {
+      beforeEach(done => {
+        client.on('room-infos', () => { done(); });
+
+        client.emit('join-room', 'test');
+      });
+
+      it('send an error', () => {
+        client.on('failure', done => {
+          expect(error).to.not.be.empty;
+
+          done();
+        });
+        client.emit('join-room', 'test');
+      });
+    });
   });
 
   describe('on message', () => {
@@ -92,9 +120,9 @@ describe('Chat', () => {
         client.emit('message', 'test')
       });
 
-      it('receives an error', done => {
-        client.on('failure', message => {
-          expect(_.isEmpty(message)).to.be.false;
+      it('send an error', done => {
+        client.on('failure', error => {
+          expect(error).to.not.be.empty;
 
           done();
         });
@@ -115,7 +143,7 @@ describe('Chat', () => {
           client.emit('message', MESSAGE)
         });
 
-        it('sends a formated message to all members of a given room', done => {
+        it('send a formated message to all members of a given room', done => {
           client.on('message', message => {
             expect(moment(message.sentAt).fromNow()).to.eq('a few seconds ago')
 
@@ -131,9 +159,9 @@ describe('Chat', () => {
           client.emit('message');
         });
 
-        it('receives an error', done => {
-          client.on('failure', message => {
-            expect(_.isEmpty(message)).to.be.false;
+        it('send an error', done => {
+          client.on('failure', error => {
+            expect(error).to.not.be.empty;
 
             done();
           });
@@ -153,21 +181,20 @@ describe('Chat', () => {
 
     context('when client was in a room', ()=> {
       beforeEach(done => {
-        client.on('room-infos', () => {
-          client.disconnect();
+        client.on('room-infos', () => { done() });
 
-          done();
-        });
         client.emit('join-room', 'test');
       });
 
-      it('leaves the room', ()=> {
+      it('leaves the room', done => {
         client.on('disconnect', () => {
-          expect(chat.findOrCreate('test').members).to.be.empty
+          setTimeout(() => {
+            expect(chat.findOrCreate('test').members).to.be.empty;
 
-          done();
+            done();
+          }, 500);
         });
-
+        client.disconnect();
       });
     });
   });

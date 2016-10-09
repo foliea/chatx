@@ -1,6 +1,7 @@
 'use strict';
 
 let _ = require('lodash'),
+  moment = require('moment'),
   Room = require('../app/room');
 
 describe('Room', () => {
@@ -37,10 +38,22 @@ describe('Room', () => {
   });
 
   describe('#add()', () => {
-    let chatter = { id: 'aiwx^plwm', nickname: 'john' };
+    let chatter = { id: 'aiwx^plwm', nickname: 'john' }, clock, channel;
 
     beforeEach(() => {
-      sinon.stub(room.channel, 'emit');
+      clock = sinon.useFakeTimers();
+
+      channel = { emit: () => {} };
+
+      sinon.stub(channel, 'emit');
+
+      sinon.stub(room.io, 'to', roomName => {
+        if (roomName === room.name) { return channel };
+      });
+    });
+
+    afterEach(() => {
+      clock.restore();
     });
 
     context('when chatter is already a member of the room', () => {
@@ -57,7 +70,7 @@ describe('Room', () => {
       });
 
       it("doesn't broadcast the updated room informations", () => {
-        expect(room.channel.emit).to.not.have.been.called;
+        expect(channel.emit).to.not.have.been.called;
       });
     });
 
@@ -71,22 +84,34 @@ describe('Room', () => {
       });
 
       it('broadcasts the updated room informations to the room chatters', () => {
-        expect(room.channel.emit).to.have.been.calledWith('room-infos', room.infos);
+        let data = { nickname: chatter.nickname, at: moment() };
+
+        expect(channel.emit).to.have.been.calledWith('member-joined', data);
       });
     });
-
-
   });
 
   describe('#remove()', () => {
-    let chatter = { id: '^pcwlwm', nickname: 'john' };
+    let chatter = { id: '^pcwlwm', nickname: 'john' }, clock, channel;
 
     beforeEach(() => {
-      sinon.stub(room.channel, 'emit');
+      clock = sinon.useFakeTimers();
+
+      channel = { emit: () => {} };
+
+      sinon.stub(channel, 'emit');
+
+      sinon.stub(room.io, 'to', roomName => {
+        if (roomName === room.name) { return channel };
+      });
 
       room.members.push(chatter);
 
       room.remove(chatter);
+    });
+
+    afterEach(() => {
+      clock.restore();
     });
 
     it('remove the chatter from the room members', () => {
@@ -96,21 +121,90 @@ describe('Room', () => {
     });
 
     it('broadcasts the updated room informations to the room chatters', () => {
-      expect(room.channel.emit).to.have.been.calledWith('room-infos', room.infos);
+      let data = { nickname: chatter.nickname, at: moment() };
+
+      expect(channel.emit).to.have.been.calledWith('member-left', data);
     });
   });
 
   describe('#send()', () => {
     const MESSAGE = 'hello!'
 
-    beforeEach(() => {
-      sinon.stub(room.channel, 'emit');
+    let channel;
 
+    beforeEach(() => {
+      channel = { emit: () => {} };
+
+      sinon.stub(channel, 'emit');
+
+      sinon.stub(room.io, 'to', roomName => {
+        if (roomName === room.name) { return channel };
+      });
       room.send(MESSAGE);
     });
 
     it('broadcasts the message to the room chatters', () => {
-      expect(room.channel.emit).to.have.been.calledWith('message', MESSAGE);
+      expect(channel.emit).to.have.been.calledWith('message', MESSAGE);
+    });
+  });
+
+  describe('#isValid', () => {
+    let io = { to: () => {} };
+
+    it('returns true', () => {
+      expect(room.isValid).to.be.true;
+    });
+
+    context('when name is undefined', () => {
+      beforeEach(() => {
+        room = new Room(io);
+      });
+
+      it('returns false', () => {
+        expect(room.isValid).to.be.false;
+      });
+    });
+
+    context('when name is empty', () => {
+      beforeEach(() => {
+        room = new Room(io, '');
+      });
+
+      it('returns false', () => {
+        expect(room.isValid).to.be.false;
+      });
+    });
+
+    context('when name only contains spaces', () => {
+      beforeEach(() => {
+        room = new Room(io, '     ');
+      });
+
+      it('returns false', () => {
+        expect(room.isValid).to.be.false;
+      });
+    });
+
+    context('when name only carriage returns', () => {
+      beforeEach(() => {
+        room = new Room(io, '\n\r\n\r');
+      });
+
+      it('returns false', () => {
+        expect(room.isValid).to.be.false;
+      });
+    });
+
+    context('when name is too long', () => {
+      beforeEach(() => {
+        let name = _.fill(new Array(281), '.').toString();
+
+        room = new Room(io, name);
+      });
+
+      it('returns false', () => {
+        expect(room.isValid).to.be.false;
+      });
     });
   });
 });
