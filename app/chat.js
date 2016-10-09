@@ -20,6 +20,8 @@ class Chat {
       socket.on('join-room', roomName => {
         let room = this.findOrCreate(roomName);
 
+        console.log(chatter.nickname);
+
         if (!room.isValid) {
           return chatter.error(INVALID_ROOM_ERROR);
         }

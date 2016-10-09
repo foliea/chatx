@@ -99,11 +99,11 @@
       self.selectors.button.send().disabled = true;
     });
 
-    this.client.on('reconnect', function() {
-      self.activeRoom = self.selectors.input.room().value;
-
-      self.client.emit('join-room', self.activeRoom);
-    });
+    // this.client.on('reconnect', function() {
+    //   self.activeRoom = self.selectors.input.room().value;
+    //
+    //   self.client.emit('join-room', self.activeRoom);
+    // });
 
     this.client.on('room-infos', function(room) {
       self.loadRoom(room);
@@ -155,6 +155,8 @@
     });
 
     this.selectors.input.message().focus();
+
+    this.selectors.block.messages().innerHTML += '<code>** Welcome to #' + this.activeRoom + '. **</code><br>';
   };
 
   UI.prototype.addMember = function(nickname) {

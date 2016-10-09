@@ -5,7 +5,7 @@ let _ = require('lodash'),
 
 class Room {
   constructor(io, name) {
-    this.channel = io.to(name);
+    this.io      = io;
     this.name    = name;
     this.members = [];
   }
@@ -14,20 +14,20 @@ class Room {
       return member.id === chatter.id;
     });
 
-    if (member) { return; }
+    if (member) { return; };
 
     this.members.push(chatter);
 
-    this.channel.emit('member-joined', { nickname: chatter.nickname, at: moment() });
+    this.io.to(this.name).emit('member-joined', { nickname: chatter.nickname, at: moment() });
   }
   remove(chatter) {
     _.remove(this.members, member => {
       return member.id === chatter.id;
     });
-    this.channel.emit('member-left', { nickname: chatter.nickname, at: moment() });
+    this.io.to(this.name).emit('member-left', { nickname: chatter.nickname, at: moment() });
   }
   send(message) {
-    this.channel.emit('message', message);
+    this.io.to(this.name).emit('message', message);
   }
   get infos() {
     let membersNickname = _.map(this.members, member => {

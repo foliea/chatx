@@ -38,12 +38,18 @@ describe('Room', () => {
   });
 
   describe('#add()', () => {
-    let chatter = { id: 'aiwx^plwm', nickname: 'john' }, clock;
+    let chatter = { id: 'aiwx^plwm', nickname: 'john' }, clock, channel;
 
     beforeEach(() => {
       clock = sinon.useFakeTimers();
 
-      sinon.stub(room.channel, 'emit');
+      channel = { emit: () => {} };
+
+      sinon.stub(channel, 'emit');
+
+      sinon.stub(room.io, 'to', roomName => {
+        if (roomName === room.name) { return channel };
+      });
     });
 
     afterEach(() => {
@@ -64,7 +70,7 @@ describe('Room', () => {
       });
 
       it("doesn't broadcast the updated room informations", () => {
-        expect(room.channel.emit).to.not.have.been.called;
+        expect(channel.emit).to.not.have.been.called;
       });
     });
 
@@ -80,18 +86,24 @@ describe('Room', () => {
       it('broadcasts the updated room informations to the room chatters', () => {
         let data = { nickname: chatter.nickname, at: moment() };
 
-        expect(room.channel.emit).to.have.been.calledWith('member-joined', data);
+        expect(channel.emit).to.have.been.calledWith('member-joined', data);
       });
     });
   });
 
   describe('#remove()', () => {
-    let chatter = { id: '^pcwlwm', nickname: 'john' }, clock;
+    let chatter = { id: '^pcwlwm', nickname: 'john' }, clock, channel;
 
     beforeEach(() => {
       clock = sinon.useFakeTimers();
 
-      sinon.stub(room.channel, 'emit');
+      channel = { emit: () => {} };
+
+      sinon.stub(channel, 'emit');
+
+      sinon.stub(room.io, 'to', roomName => {
+        if (roomName === room.name) { return channel };
+      });
 
       room.members.push(chatter);
 
@@ -111,21 +123,28 @@ describe('Room', () => {
     it('broadcasts the updated room informations to the room chatters', () => {
       let data = { nickname: chatter.nickname, at: moment() };
 
-      expect(room.channel.emit).to.have.been.calledWith('member-left', data);
+      expect(channel.emit).to.have.been.calledWith('member-left', data);
     });
   });
 
   describe('#send()', () => {
     const MESSAGE = 'hello!'
 
-    beforeEach(() => {
-      sinon.stub(room.channel, 'emit');
+    let channel;
 
+    beforeEach(() => {
+      channel = { emit: () => {} };
+
+      sinon.stub(channel, 'emit');
+
+      sinon.stub(room.io, 'to', roomName => {
+        if (roomName === room.name) { return channel };
+      });
       room.send(MESSAGE);
     });
 
     it('broadcasts the message to the room chatters', () => {
-      expect(room.channel.emit).to.have.been.calledWith('message', MESSAGE);
+      expect(channel.emit).to.have.been.calledWith('message', MESSAGE);
     });
   });
 
