@@ -97,13 +97,13 @@
 
       self.selectors.button.join().disabled = true;
       self.selectors.button.send().disabled = true;
+
+      self.selectors.block.activeRoom().innerHTML = 'Waiting for reconnection...';
     });
 
-    // this.client.on('reconnect', function() {
-    //   self.activeRoom = self.selectors.input.room().value;
-    //
-    //   self.client.emit('join-room', self.activeRoom);
-    // });
+    this.client.on('reconnect', function() {
+      self.selectors.block.activeRoom().innerHTML = 'No active channel';
+    });
 
     this.client.on('room-infos', function(room) {
       self.loadRoom(room);
