@@ -44,7 +44,7 @@
     this.selectors.button.join().disabled = true;
     this.selectors.button.send().disabled = true;
 
-    this.selectors.input.room().disabled  = true;
+    this.selectors.input.room().focus();
 
     this.selectors.button.join().addEventListener('click', function() {
       self.activeRoom = self.selectors.input.room().value;
@@ -67,12 +67,24 @@
       }
     });
 
+    this.selectors.input.room().addEventListener('keydown', function(e) {
+      if (e.which !== 13) { return; }
+
+      self.selectors.button.join().click();
+    });
+
     this.selectors.input.message().addEventListener('input', function(input) {
       if (!self.isInARoom || self.selectors.input.message().value.trim() == '') {
         self.selectors.button.send().disabled = true;
       } else {
         self.selectors.button.send().disabled = false;
       }
+    });
+
+    this.selectors.input.message().addEventListener('keydown', function(e) {
+      if (e.which !== 13) { return; }
+
+      self.selectors.button.send().click();
     });
 
     this.client.on('connect', function() {
@@ -115,10 +127,14 @@
 
   UI.prototype.activate = function() {
     this.selectors.input.room().disabled = false;
+
+    this.selectors.input.room();
   };
 
   UI.prototype.populateChat = function(content) {
     this.selectors.input.message().value = '';
+
+    this.selectors.button.send().disabled = true;
 
     this.selectors.block.messages().innerHTML += '<code>[' + content.sentAt + '] [' + content.sender + '] ' + content.text + '</code><br>';
   };
@@ -137,6 +153,8 @@
     room.members.forEach(function(nickname) {
       self.addMember(nickname);
     });
+
+    this.selectors.input.message().focus();
   };
 
   UI.prototype.addMember = function(nickname) {
