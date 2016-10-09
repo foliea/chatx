@@ -32,7 +32,9 @@
   function UI(selectors, client) {
     this.selectors  = selectors;
     this.client     = client;
-    this.isInARoom  = true;
+
+    this.isInARoom  = false;
+
     this.activeRoom = null;
   }
 
@@ -45,8 +47,6 @@
     this.selectors.input.room().disabled  = true;
 
     this.selectors.button.join().addEventListener('click', function() {
-      self.selectors.block.messages().innerHTML = '';
-
       self.activeRoom = self.selectors.input.room().value;
 
       self.client.emit('join-room', self.activeRoom);
@@ -79,35 +79,73 @@
       self.activate();
     });
 
+    this.client.on('disconnect', function() {
+      self.activeRoom = false;
+      self.inARoom    = false;
+
+      self.selectors.button.join().disabled = true;
+      self.selectors.button.send().disabled = true;
+    });
+
+    this.client.on('reconnect', function() {
+      self.activeRoom = self.selectors.input.room().value;
+
+      self.client.emit('join-room', self.activeRoom);
+    });
+
     this.client.on('room-infos', function(room) {
       self.loadRoom(room);
     });
     this.client.on('message', function(content) {
       self.populateChat(content);
     });
-  }
+
+    this.client.on('member-joined', function(content) {
+      self.populateChat({ sentAt: content.at, sender: content.nickname, text: 'joined the room.' });
+
+      self.addMember(content.nickname);
+    });
+
+    this.client.on('member-left', function(content) {
+      self.populateChat({ sentAt: content.at, sender: content.nickname, text: 'left the room.' });
+
+      self.removeMember(content.nickname);
+    });
+  };
 
   UI.prototype.activate = function() {
     this.selectors.input.room().disabled = false;
-  }
+  };
 
   UI.prototype.populateChat = function(content) {
     this.selectors.input.message().value = '';
 
-    this.selectors.block.messages().innerHTML += '<span>[' + content.sentAt + '] [' + content.sender + '] ' + content.text + '</span><br>';
-  }
+    this.selectors.block.messages().innerHTML += '<code>[' + content.sentAt + '] [' + content.sender + '] ' + content.text + '</code><br>';
+  };
 
   UI.prototype.loadRoom = function(room) {
+    this.selectors.block.messages().innerHTML = '';
+
     this.selectors.block.activeRoom().innerHTML = '#' + this.activeRoom;
 
     this.isInARoom = true;
 
     this.selectors.block.members().innerHTML = '';
 
-    room.members.forEach(nickname => {
-      this.selectors.block.members().innerHTML += '<li class="list-group-item">' + nickname + '</li>'
+    var self = this;
+
+    room.members.forEach(function(nickname) {
+      self.addMember(nickname);
     });
-  }
+  };
+
+  UI.prototype.addMember = function(nickname) {
+    this.selectors.block.members().innerHTML += '<li id="' + nickname + '" class="list-group-item">' + nickname + '</li>';
+  };
+
+  UI.prototype.removeMember = function(nickname) {
+    document.getElementById(nickname).remove();
+  };
 
   var ui = new UI(selectors, io.connect());
 

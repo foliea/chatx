@@ -17,38 +17,53 @@
     <script src="js/chat.js"></script>
 
     <main role="main">
-      <h2>Welcome on ChatX!</h2>
+
 
       <section class="container-fluid">
-        <input type="text" name="room" placeholder="Enter room name"> <button id="join-room" type="button">Join</button>
-
-        <div class="panel panel-primary">
-          <div class="panel-heading">
-            <h3 id="active-room" class="panel-title">None</h3>
-          </div>
-          <div class="panel-body">
-            <div class="col-sm-6 col-md-4">
-              <div class="panel panel-info">
-                <div class="panel-heading">
-                  <h3 id="active-room" class="panel-title">Members</h3>
-                </div>
-                <div class="panel-body">
-                  <ul id="members" class="list-group"></ul>
-                </div>
-              </div>
+        <div class="row">
+          <center><h2>Welcome on ChatX!</h2></center>
+        </div>
+        <div class="row">
+          <div class="col-sm-6 col-md-5"></div>
+          <div class="col-sm-3 col-md-2">
+            <div class="input-group">
+              <input type="text" name="room" maxLength="10" class="form-control" placeholder="Enter room name">
+              <span class="input-group-btn">
+                <button id="join-room" type="button" class="btn btn-default" >Join</button>
+              </span>
             </div>
-            <div class="col-sm-12 col-md-8">
-              <div class="row">
-                <div class="panel panel-default">
-                  <div id="messages" class="panel-body"></div>
+          </div>
+          <div class="col-sm-6 col-md-5"></div>
+        </div>
+        <div class="row">
+          <div class="panel panel-primary">
+            <div class="panel-heading">
+              <h3 id="active-room" class="panel-title">None</h3>
+            </div>
+            <div class="panel-body">
+              <div class="col-sm-6 col-md-4">
+                <div class="panel panel-info">
+                  <div class="panel-heading">
+                    <h3 id="active-room" class="panel-title">Members</h3>
+                  </div>
+                  <div class="panel-body">
+                    <ul id="members" class="list-group"></ul>
+                  </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="input-group">
-                  <input type="text" name="message" maxlength="280" class="form-control" placeholder="Let's chat...">
-                  <span class="input-group-btn">
-                    <button id="send" class="btn btn-default" type="button">Send</button>
-                  </span>
+              <div class="col-sm-12 col-md-8">
+                <div class="row">
+                  <div class="panel panel-default">
+                    <div id="messages" class="panel-body"></div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="input-group">
+                    <input type="text" name="message" maxlength="280" class="form-control" placeholder="Let's chat...">
+                    <span class="input-group-btn">
+                      <button id="send" class="btn btn-default" type="button">Send</button>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

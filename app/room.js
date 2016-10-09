@@ -1,6 +1,7 @@
 'use strict';
 
-let _ = require('lodash');
+let _ = require('lodash'),
+  moment = require('moment');
 
 class Room {
   constructor(io, name) {
@@ -17,13 +18,13 @@ class Room {
 
     this.members.push(chatter);
 
-    this.channel.emit('room-infos', this.infos);
+    this.channel.emit('member-joined', { nickname: chatter.nickname, at: moment() });
   }
   remove(chatter) {
     _.remove(this.members, member => {
       return member.id === chatter.id;
     });
-    this.channel.emit('room-infos', this.infos);
+    this.channel.emit('member-left', { nickname: chatter.nickname, at: moment() });
   }
   send(message) {
     this.channel.emit('message', message);
@@ -33,6 +34,10 @@ class Room {
       return member.nickname;
     });
     return { members: membersNickname };
+  }
+  get isValid() {
+    return !_.isUndefined(this.name) && !_.isEmpty(this.name.trim()) &&
+      this.name.length <= 10;
   }
 }
 

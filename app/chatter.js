@@ -3,7 +3,8 @@
 let Chance = require('chance'),
   chance = new Chance();
 
-const JOIN_ROOM_ERROR = 'Please join a room first';
+const JOIN_ROOM_ERROR = 'Please join a room first',
+      ALREADY_IN_ROOM = 'Chatter already in room.';
 
 class Chatter {
   constructor(socket) {
@@ -13,13 +14,20 @@ class Chatter {
     this.activeRoom = null;
   }
   join(room) {
-    if (this.activeRoom) { this.leave() };
+    if (this.activeRoom) {
+      if (this.activeRoom.name === room.name) {
+        return this.error(ALREADY_IN_ROOM);
+      }
+      this.leave();
+    };
 
     this.activeRoom = room;
 
     this.socket.join(room.name);
 
     room.add(this);
+
+    this.socket.emit('room-infos', room.infos);
   }
   leave() {
     if (!this.activeRoom) {

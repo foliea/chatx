@@ -51,7 +51,9 @@ describe('Chatter', () => {
 
       sinon.stub(chatter.socket, 'join');
 
-      room = { name: '/b', add: ()=>{} };
+      sinon.stub(chatter.socket, 'emit');
+
+      room = { name: '/b', add: ()=>{}, infos: {} };
 
       sinon.stub(room, 'add');
     });
@@ -76,6 +78,10 @@ describe('Chatter', () => {
       it('sets its active room to given room', ()=> {
         expect(chatter.activeRoom).to.eq(room);
       });
+
+      it('sends the room infos to the chatter', () => {
+        expect(chatter.socket.emit).to.have.been.calledWith('room-infos', room.infos);
+      });
     });
 
     context('when chatter was in another room', ()=> {
@@ -99,6 +105,30 @@ describe('Chatter', () => {
 
       it('sets its active room to given room', ()=> {
         expect(chatter.activeRoom).to.eq(room);
+      });
+
+      it('sends the room infos to the chatter', () => {
+        expect(chatter.socket.emit).to.have.been.calledWith('room-infos', room.infos);
+      });
+    });
+
+    context('when chatter was already in this room', ()=> {
+      beforeEach(() => {
+        chatter.activeRoom = { name: '/c' };
+
+        chatter.join(room);
+
+        sinon.stub(chatter, 'error');
+
+        chatter.join(room);
+      });
+
+      it('returns an error', ()=> {
+        expect(chatter.error).to.have.been.calledOnce;
+      });
+
+      it("doesn't add itself to given room", () => {
+        expect(room.add).to.have.been.calledOnce;
       });
     });
   });
@@ -170,7 +200,6 @@ describe('Chatter', () => {
       it('sends an error to the chatter', () => {
         expect(chatter.error).to.have.been.calledWith('Please join a room first');
       });
-
     });
   });
 
