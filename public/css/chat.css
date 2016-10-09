@@ -1,0 +1,17 @@
+.top-buffer {
+  margin-top: 20px;
+}
+
+.chat {
+  height: 600px;
+}
+
+.members {
+  height: 465px;
+  overflow-y: scroll;
+}
+
+.messages {
+  height: 450px;
+  overflow-y: scroll;
+}

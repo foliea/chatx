@@ -14,11 +14,11 @@
 
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
 
+    <link rel="stylesheet" href="css/chat.css">
+
     <script src="js/chat.js"></script>
 
     <main role="main">
-
-
       <section class="container-fluid">
         <div class="row">
           <center><h2>Welcome on ChatX!</h2></center>
@@ -35,34 +35,36 @@
           </div>
           <div class="col-sm-6 col-md-5"></div>
         </div>
-        <div class="row">
-          <div class="panel panel-primary">
-            <div class="panel-heading">
-              <h3 id="active-room" class="panel-title">No active channel</h3>
-            </div>
-            <div class="panel-body">
-              <div class="col-sm-6 col-md-4">
-                <div class="panel panel-info">
-                  <div class="panel-heading">
-                    <h3 id="active-room" class="panel-title">Members</h3>
-                  </div>
-                  <div class="panel-body">
-                    <ul id="members" class="list-group"></ul>
-                  </div>
-                </div>
+        <div class="row top-buffer">
+          <div class="col-sm-12 col-md-12">
+            <div class="chat panel panel-primary">
+              <div class="panel-heading">
+                <h3 id="active-room" class="panel-title">No active channel</h3>
               </div>
-              <div class="col-sm-12 col-md-8">
-                <div class="row">
-                  <div class="panel panel-default">
-                    <div id="messages" class="panel-body"></div>
+              <div class="panel-body">
+                <div class="col-sm-6 col-md-4">
+                  <div class="panel panel-info">
+                    <div class="panel-heading">
+                      <h3 id="active-room" class="panel-title">Members</h3>
+                    </div>
+                    <div class="members panel-body">
+                      <ul id="members" class="list-group"></ul>
+                    </div>
                   </div>
                 </div>
-                <div class="row">
-                  <div class="input-group">
-                    <input type="text" name="message" maxlength="280" class="form-control" placeholder="Let's chat...">
-                    <span class="input-group-btn">
-                      <button id="send" class="btn btn-default" type="button">Send</button>
-                    </span>
+                <div class="col-sm-12 col-md-8">
+                  <div class="row">
+                    <div class="messages panel panel-default">
+                      <div id="messages" class="panel-body"></div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="input-group">
+                      <input type="text" name="message" maxlength="280" class="form-control" placeholder="Let's chat...">
+                      <span class="input-group-btn">
+                        <button id="send" class="btn btn-default" type="button">Send</button>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
