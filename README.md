@@ -28,6 +28,19 @@ To run the test suite:
 
     npm test
 
+## Docker
+
+Alternatively you can get a preconfigured environment to run the above commands if
+you have [Docker](http://docker.com) installed on your machine.
+
+To get this environment:
+
+    docker run -ti -p 3000:3000 -v $PWD:/app node /bin/bash
+
+Then to get into the application directoy run:
+
+    cd /app
+
 ## Author
 
 **Adrien Folie**
