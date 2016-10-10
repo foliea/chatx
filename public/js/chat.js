@@ -12,7 +12,8 @@
     block: {
       messages:   document.getElementById('messages'),
       members:    document.getElementById('members'),
-      activeRoom: document.getElementById('active-room')
+      activeRoom: document.getElementById('active-room'),
+      error:      document.getElementById('error')
     }
   };
 
@@ -50,6 +51,8 @@
 
     this.selectors.input.nickname.addEventListener('input', function() {
       self.selectors.input.nickname.value = self.selectors.input.nickname.value.trim();
+
+      self.selectors.block.error.classList.add('hidden');
     });
 
     this.selectors.input.nickname.addEventListener('input', function() {
@@ -121,6 +124,12 @@
       self.populateChat({ sentAt: content.at, sender: content.nickname, text: 'left the room.' });
 
       self.removeMember(content.nickname);
+    });
+
+    this.client.on('failure', function(error) {
+      self.selectors.block.error.innerHTML = error;
+
+      self.selectors.block.error.classList.remove('hidden');
     });
   };
 

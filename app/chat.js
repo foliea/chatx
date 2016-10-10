@@ -7,7 +7,7 @@ let _ = require('lodash'),
 
 const INVALID_MESSAGE_ERROR = 'Message must be present.',
       INVALID_ROOM_ERROR    = 'Room name must be present.',
-      INVALID_NICKNAME      = 'Nickname must be present or already in use.'
+      INVALID_NICKNAME      = "You can't join this room with this nickname."
 
 
 class Chat {

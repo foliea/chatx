@@ -15,3 +15,7 @@
   height: 450px;
   overflow-y: scroll;
 }
+
+#error {
+  color: red;
+}
