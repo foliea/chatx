@@ -19,12 +19,6 @@ describe('Message', () => {
     });
   });
 
-  describe('#sender', () => {
-    it('is equal to the chatter nickname who sent the message', () => {
-      expect(message.sender).to.eq('JohnSnow');
-    });
-  });
-
   describe('#text', () => {
     it('is equal to the message the chatter sent', () => {
       expect(message.text).to.eq('hello')

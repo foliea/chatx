@@ -9,25 +9,41 @@ class Room {
     this.name    = name;
     this.members = [];
   }
-  add(chatter) {
+  add(chatter, options) {
+    this.members.push({ id: chatter.id, nickname: options.as });
+
+    this.io.to(this.name).emit('member-joined', { nickname: options.as, at: moment() });
+  }
+  remove(chatter) {
     let member = _.find(this.members, member => {
       return member.id === chatter.id;
     });
-
-    if (member) { return; };
-
-    this.members.push(chatter);
-
-    this.io.to(this.name).emit('member-joined', { nickname: chatter.nickname, at: moment() });
-  }
-  remove(chatter) {
     _.remove(this.members, member => {
       return member.id === chatter.id;
     });
-    this.io.to(this.name).emit('member-left', { nickname: chatter.nickname, at: moment() });
+    this.io.to(this.name).emit('member-left', { nickname: member.nickname, at: moment() });
   }
-  send(message) {
+  send(message, options) {
+    let member = _.find(this.members, member => {
+      return member.id === options.from;
+    })
+    message.sender = member.nickname;
+
     this.io.to(this.name).emit('message', message);
+  }
+  isAuthorized(nickname) {
+    return !_.isUndefined(nickname) && !_.isEmpty(nickname.trim()) &&
+      nickname.trim().length <= 10 && !this._isAlreadyInUse(nickname);
+  }
+  isMember(id, nickname) {
+    return !_.isUndefined(_.find(this.members, member => {
+      return member.id === id && member.nickname === nickname;
+    }));
+  }
+  _isAlreadyInUse(nickname) {
+    return _.find(this.members, member => {
+      return member.nickname === nickname;
+    });
   }
   get infos() {
     let membersNickname = _.map(this.members, member => {

@@ -17,16 +17,6 @@ describe('Chatter', () => {
     });
   });
 
-  describe('#nickname', () => {
-    it('is a string', () => {
-      expect(chatter.nickname).to.be.a.string;
-    });
-
-    it('is not empty', () => {
-      expect(chatter.nickname.trim()).to.not.be.empty;
-    });
-  });
-
   describe('#isInARoom', () => {
     it('returns false', () => {
       expect(chatter.isInARoom).to.be.false;
@@ -54,8 +44,6 @@ describe('Chatter', () => {
       sinon.stub(chatter.socket, 'emit');
 
       room = { name: '/b', add: ()=>{}, infos: {} };
-
-      sinon.stub(room, 'add');
     });
 
     context('when chatter was not in a room', ()=> {
@@ -69,10 +57,6 @@ describe('Chatter', () => {
 
       it('joins given room', () => {
         expect(chatter.socket.join).to.have.been.calledWith(room.name);
-      });
-
-      it('adds itself to given room', () => {
-        expect(room.add).to.have.been.calledWith(chatter);
       });
 
       it('sets its active room to given room', ()=> {
@@ -99,36 +83,12 @@ describe('Chatter', () => {
         expect(chatter.socket.join).to.have.been.calledWith(room.name);
       });
 
-      it('adds itself to given room', () => {
-        expect(room.add).to.have.been.calledWith(chatter);
-      });
-
       it('sets its active room to given room', ()=> {
         expect(chatter.activeRoom).to.eq(room);
       });
 
       it('sends the room infos to the chatter', () => {
         expect(chatter.socket.emit).to.have.been.calledWith('room-infos', room.infos);
-      });
-    });
-
-    context('when chatter was already in this room', ()=> {
-      beforeEach(() => {
-        chatter.activeRoom = { name: '/c' };
-
-        chatter.join(room);
-
-        sinon.stub(chatter, 'error');
-
-        chatter.join(room);
-      });
-
-      it('returns an error', ()=> {
-        expect(chatter.error).to.have.been.calledOnce;
-      });
-
-      it("doesn't add itself to given room", () => {
-        expect(room.add).to.have.been.calledOnce;
       });
     });
   });
@@ -186,7 +146,7 @@ describe('Chatter', () => {
       });
 
       it('sends a message to the chatter active room', () => {
-        expect(chatter.activeRoom.send).to.have.been.calledWith('message');
+        expect(chatter.activeRoom.send).to.have.been.calledWith('message', { from: chatter.id });
       });
     });
 

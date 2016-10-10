@@ -1,31 +1,19 @@
 'use strict';
 
-let Chance = require('chance'),
-  chance = new Chance();
-
-const JOIN_ROOM_ERROR = 'Please join a room first',
-      ALREADY_IN_ROOM = 'Chatter already in room.';
+const JOIN_ROOM_ERROR = 'Please join a room first';
 
 class Chatter {
   constructor(socket) {
     this.socket     = socket;
     this.id         = socket.id;
-    this.nickname   = chance.name();
     this.activeRoom = null;
   }
   join(room) {
-    if (this.activeRoom) {
-      if (this.activeRoom.name === room.name) {
-        return this.error(ALREADY_IN_ROOM);
-      }
-      this.leave();
-    };
+    if (this.activeRoom) { this.leave() };
 
     this.activeRoom = room;
 
     this.socket.join(room.name);
-
-    room.add(this);
 
     this.socket.emit('room-infos', room.infos);
   }
@@ -43,7 +31,7 @@ class Chatter {
     if (!this.activeRoom) {
       return this.error(JOIN_ROOM_ERROR);
     }
-    this.activeRoom.send(message);
+    this.activeRoom.send(message, { from: this.id });
   }
   error(content) {
     this.socket.emit('failure', content);

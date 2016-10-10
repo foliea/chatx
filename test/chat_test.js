@@ -37,33 +37,33 @@ describe('Chat', () => {
   });
 
   describe('on join-room', () => {
-    context("when room doesn't exist", () => {
-      const ROOM_NAME = 'test';
+    const DATA = { nickname: 'adrien', room: '/b' };
 
+    context("when room doesn't exist", () => {
       it('creates a new room', done => {
         client.on('room-infos', () => {
           expect(chat.rooms.length).to.eq(1);
 
           done();
         });
-        client.emit('join-room', ROOM_NAME);
+        client.emit('join-room', DATA);
       });
 
       it('chatter joins the room', done => {
         client.on('room-infos', () => {
-          expect(chat.rooms[0].members.length).to.eq(1);
+          expect(_.find(chat.rooms[0].members, member => {
+            return member.nickname === DATA.nickname;
+          })).to.exist;
 
           done();
         });
-        client.emit('join-room', ROOM_NAME);
+        client.emit('join-room', DATA);
       });
     });
 
     context("when room already exist", () => {
-      const ROOM_NAME = '/b';
-
       beforeEach(() => {
-        chat.rooms.push(new Room(server, '/b'));
+        chat.rooms.push(new Room(server, DATA.room));
       });
 
       it("doesn't create a new room", done => {
@@ -72,16 +72,18 @@ describe('Chat', () => {
 
           done();
         });
-        client.emit('join-room', ROOM_NAME);
+        client.emit('join-room', DATA);
       });
 
       it('chatter joins the room', done => {
         client.on('room-infos', () => {
-          expect(chat.rooms[0].members.length).to.eq(1);
+          expect(_.find(chat.rooms[0].members, member => {
+            return member.nickname === DATA.nickname;
+          })).to.exist;
 
           done();
         });
-        client.emit('join-room', ROOM_NAME);
+        client.emit('join-room', DATA);
       });
     });
 
@@ -92,7 +94,7 @@ describe('Chat', () => {
 
           done();
         });
-        client.emit('join-room');
+        client.emit('join-room', { nickname: 'johnsnow' });
       });
     });
 
@@ -100,7 +102,7 @@ describe('Chat', () => {
       beforeEach(done => {
         client.on('room-infos', () => { done(); });
 
-        client.emit('join-room', 'test');
+        client.emit('join-room', { nickname: 'johnsnow', room: 'test' });
       });
 
       it('send an error', () => {
@@ -109,7 +111,7 @@ describe('Chat', () => {
 
           done();
         });
-        client.emit('join-room', 'test');
+        client.emit('join-room', { nickname: 'johnsnow', room: 'test' });
       });
     });
   });
@@ -133,7 +135,7 @@ describe('Chat', () => {
       beforeEach(done => {
         client.on('room-infos', () => { done(); });
 
-        client.emit('join-room', 'test');
+        client.emit('join-room', { nickname: 'johnsnow', room: 'test' });
       });
 
       context('when message is valid', () => {
@@ -170,6 +172,33 @@ describe('Chat', () => {
     });
   });
 
+  describe('on leave-room', () => {
+    context('when client was not in a room', () => {
+      it("doesn't fail", done => {
+        client.on('leave-room', () => { done(); });
+
+        client.emit('leave-room');
+      });
+    });
+
+    context('when client was in a room', ()=> {
+      beforeEach(done => {
+        client.on('room-infos', () => { done() });
+
+        client.emit('join-room', { nickname: 'johnsnow', room: 'test' });
+      });
+
+      it('leaves the room', done => {
+        client.on('leave-room', () => {
+          expect(chat.findOrCreate('test').members).to.be.empty;
+
+          done();
+        });
+        client.emit('leave-room');
+      });
+    });
+  });
+
   describe('on disconnect', ()=> {
     context("wasn't in a room", () => {
       it("doesn't fail", done => {
@@ -183,7 +212,7 @@ describe('Chat', () => {
       beforeEach(done => {
         client.on('room-infos', () => { done() });
 
-        client.emit('join-room', 'test');
+        client.emit('join-room', { nickname: 'johnsnow', room: 'test' });
       });
 
       it('leaves the room', done => {
