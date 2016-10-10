@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "babel-register": "6.16.x",
-    "chance": "1.0.x",
     "express": "4.14.x",
     "lodash": "4.16.x",
     "moment": "2.15.x",

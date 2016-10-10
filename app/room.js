@@ -9,14 +9,8 @@ class Room {
     this.name    = name;
     this.members = [];
   }
-  add(chatter) {
-    let member = _.find(this.members, member => {
-      return member.id === chatter.id;
-    });
-
-    if (member) { return; };
-
-    this.members.push(chatter);
+  add(chatter, options) {
+    this.members.push({ id: chatter.id, nickname: options.as });
 
     this.io.to(this.name).emit('member-joined', { nickname: chatter.nickname, at: moment() });
   }
@@ -28,6 +22,15 @@ class Room {
   }
   send(message) {
     this.io.to(this.name).emit('message', message);
+  }
+  isAuthorized(nickname) {
+    return !_.isUndefined(nickname) && !_.isEmpty(nickname.trim()) &&
+      nickname.trim().length <= 10 && !this._isAlreadyInUse(nickname);
+  }
+  _isAlreadyInUse(nickname) {
+    return _.find(this.members, member => {
+      return member.nickname === nickname;
+    });
   }
   get infos() {
     let membersNickname = _.map(this.members, member => {

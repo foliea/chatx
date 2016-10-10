@@ -6,7 +6,9 @@ let _ = require('lodash'),
   Room = require('./room');
 
 const INVALID_MESSAGE_ERROR = 'Message must be present.',
-      INVALID_ROOM_ERROR    = "Room name must be present.";
+      INVALID_ROOM_ERROR    = 'Room name must be present.',
+      INVALID_NICKNAME      = 'Nickname must be present or already in use.'
+
 
 class Chat {
   constructor(io) {
@@ -17,16 +19,23 @@ class Chat {
     this.io.on('connection', socket => {
       let chatter = new Chatter(socket);
 
-      socket.on('join-room', roomName => {
-        let room = this.findOrCreate(roomName);
+      socket.on('join-room', req => {
+        req = req || {};
+
+        let room = this.findOrCreate(req.room);
 
         if (!room.isValid) {
           return chatter.error(INVALID_ROOM_ERROR);
         }
+        if (!room.isAuthorized(req.nickname)) {
+          return chatter.error(INVALID_NICKNAME);
+        }
         chatter.join(room);
+
+        room.add(chatter, { as: req.nickname.trim() })
       });
-      socket.on('message', content => {
-        let message = new Message(content, chatter);
+      socket.on('message', req => {
+        let message = new Message(req, chatter);
 
         if (!message.isValid) {
           return chatter.error(INVALID_MESSAGE_ERROR);

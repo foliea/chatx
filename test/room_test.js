@@ -38,7 +38,7 @@ describe('Room', () => {
   });
 
   describe('#add()', () => {
-    let chatter = { id: 'aiwx^plwm', nickname: 'john' }, clock, channel;
+    let chatter = { id: 'aiwx^plwm' }, clock, channel;
 
     beforeEach(() => {
       clock = sinon.useFakeTimers();
@@ -50,49 +50,29 @@ describe('Room', () => {
       sinon.stub(room.io, 'to', roomName => {
         if (roomName === room.name) { return channel };
       });
+
+      room.add(chatter, { as: 'johndoe' });
     });
 
     afterEach(() => {
       clock.restore();
     });
 
-    context('when chatter is already a member of the room', () => {
-      beforeEach(() => {
-        room.members.push(chatter);
-
-        room.add(chatter);
-      });
-
-      it('adds the chatter to the room members', () => {
-        expect(_.find(room.members, member => {
-          return member.id === chatter.id;
-        })).to.exist;
-      });
-
-      it("doesn't broadcast the updated room informations", () => {
-        expect(channel.emit).to.not.have.been.called;
-      });
+    it("adds the chatter to the room members", () => {
+      expect(_.find(room.members, member => {
+        return member.id === chatter.id && member.nickname == 'johndoe';
+      })).to.exist;
     });
 
-    context('when chatter is not a member of the room', () => {
-      beforeEach(() => {
-        room.add(chatter);
-      });
+    it('broadcasts the updated room informations to the room chatters', () => {
+      let data = { nickname: chatter.nickname, at: moment() };
 
-      it("doesn't add a duplicate of this chatter", () => {
-        expect(room.members.count).to.eq(_.uniq(room.members).count);
-      });
-
-      it('broadcasts the updated room informations to the room chatters', () => {
-        let data = { nickname: chatter.nickname, at: moment() };
-
-        expect(channel.emit).to.have.been.calledWith('member-joined', data);
-      });
+      expect(channel.emit).to.have.been.calledWith('member-joined', data);
     });
   });
 
   describe('#remove()', () => {
-    let chatter = { id: '^pcwlwm', nickname: 'john' }, clock, channel;
+    let chatter = { id: '^pcwlwm' }, clock, channel;
 
     beforeEach(() => {
       clock = sinon.useFakeTimers();
@@ -204,6 +184,56 @@ describe('Room', () => {
 
       it('returns false', () => {
         expect(room.isValid).to.be.false;
+      });
+    });
+  });
+
+  describe('#isAuthorized()', () => {
+    it('returns true', () => {
+      expect(room.isAuthorized('test')).to.be.true;
+    });
+
+    context('when nickname is undefined', () => {
+      it('returns false', () => {
+        expect(room.isAuthorized()).to.be.false;
+      });
+    });
+
+    context('when nickname is empty', () => {
+      it('returns false', () => {
+        expect(room.isAuthorized('')).to.be.false;
+      });
+    });
+
+    context('when nickname only contains spaces', () => {
+      it('returns false', () => {
+        expect(room.isAuthorized('    ')).to.be.false;
+      });
+    });
+
+    context('when nickname only carriage returns', () => {
+      it('returns false', () => {
+        expect(room.isAuthorized('\r\n\r\n')).to.be.false;
+      });
+    });
+
+    context('when nickname is too long', () => {
+      it('returns false', () => {
+        let nickname = _.fill(new Array(281), '.').toString();
+
+        expect(room.isAuthorized(nickname)).to.be.false;
+      });
+    });
+
+    context('when nickname is already in use', () => {
+      const NICKNAME = 'sam';
+
+      beforeEach(() => {
+        room.members.push({ id: 'dspko;', nickname: NICKNAME });
+      });
+
+      it('returns false', () => {
+        expect(room.isAuthorized(NICKNAME)).to.be.false;
       });
     });
   });
