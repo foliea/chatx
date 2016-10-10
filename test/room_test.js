@@ -65,7 +65,7 @@ describe('Room', () => {
     });
 
     it('broadcasts the updated room informations to the room chatters', () => {
-      let data = { nickname: chatter.nickname, at: moment() };
+      let data = { nickname: 'johndoe', at: moment() };
 
       expect(channel.emit).to.have.been.calledWith('member-joined', data);
     });
@@ -108,9 +108,8 @@ describe('Room', () => {
   });
 
   describe('#send()', () => {
-    const MESSAGE = 'hello!'
-
-    let channel;
+    let message = { text: 'hello!', sentAt: moment() },
+        chatter = { id: 'eriojwpokxmMJ?LK', nickname: 'chirac' }, channel;
 
     beforeEach(() => {
       channel = { emit: () => {} };
@@ -120,11 +119,14 @@ describe('Room', () => {
       sinon.stub(room.io, 'to', roomName => {
         if (roomName === room.name) { return channel };
       });
-      room.send(MESSAGE);
+
+      room.members.push(chatter)
+
+      room.send(message, { from: chatter.id });
     });
 
     it('broadcasts the message to the room chatters', () => {
-      expect(channel.emit).to.have.been.calledWith('message', MESSAGE);
+      expect(channel.emit).to.have.been.calledWith('message', message);
     });
   });
 

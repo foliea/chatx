@@ -7,7 +7,6 @@ class Message {
   constructor(text, chatter) {
     this.sentAt = moment();
     this.text   = text;
-    this.sender = chatter.nickname;
   }
   get isValid() {
     return !_.isUndefined(this.text) && !_.isEmpty(this.text.trim()) &&

@@ -162,7 +162,7 @@ describe('Chatter', () => {
       });
 
       it('sends a message to the chatter active room', () => {
-        expect(chatter.activeRoom.send).to.have.been.calledWith('message');
+        expect(chatter.activeRoom.send).to.have.been.calledWith('message', { from: chatter.id });
       });
     });
 

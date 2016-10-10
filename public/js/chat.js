@@ -5,8 +5,9 @@
       send: document.getElementById('send')
     },
     input: {
-      room:    document.querySelector('input[name="room"]'),
-      message: document.querySelector('input[name="message"]')
+      nickname: document.querySelector('input[name="nickname"]'),
+      room:     document.querySelector('input[name="room"]'),
+      message:  document.querySelector('input[name="message"]')
     },
     block: {
       messages:   document.getElementById('messages'),
@@ -30,27 +31,39 @@
     this.selectors.button.join.disabled = true;
     this.selectors.button.send.disabled = true;
 
-    this.selectors.input.room.focus();
+    this.selectors.input.nickname.focus();
 
     this.selectors.button.join.addEventListener('click', function() {
-      self.activeRoom = self.selectors.input.room.value;
+      var req = {
+        nickname: self.selectors.input.nickname.value,
+        room:     self.selectors.input.room.value,
+      };
+      self.activeRoom = req.room;
 
-      self.client.emit('join-room', self.activeRoom);
+      self.client.emit('join-room', req);
     });
 
     this.selectors.button.send.addEventListener('click', function() {
-      var message = self.selectors.input.message.value,
-        roomName  = self.selectors.block.activeRoom.innerHTML;
 
-      self.client.emit('message', message);
+      self.client.emit('message', self.selectors.input.message.value);
     });
 
-    this.selectors.input.room.addEventListener('input', function(input) {
-      if (self.selectors.input.room.value == '') {
-        self.selectors.button.join.disabled = true;
-      } else {
-        self.selectors.button.join.disabled = false;
-      }
+    this.selectors.input.nickname.addEventListener('input', function() {
+      self.selectors.input.nickname.value = self.selectors.input.nickname.value.trim();
+    });
+
+    this.selectors.input.nickname.addEventListener('input', function() {
+      self.changeJoinButtonState();
+    });
+
+    this.selectors.input.room.addEventListener('input', function() {
+      self.changeJoinButtonState();
+    });
+
+    this.selectors.input.nickname.addEventListener('keydown', function(e) {
+      if (e.which !== 13) { return; }
+
+      self.selectors.button.join.click();
     });
 
     this.selectors.input.room.addEventListener('keydown', function(e) {
@@ -115,6 +128,14 @@
     this.selectors.input.room.disabled = false;
 
     this.selectors.input.room;
+  };
+
+  UI.prototype.changeJoinButtonState = function() {
+    if (this.selectors.input.nickname.value == '' || this.selectors.input.room.value == '') {
+      this.selectors.button.join.disabled = true;
+    } else {
+      this.selectors.button.join.disabled = false;
+    }
   };
 
   UI.prototype.populateChat = function(content) {

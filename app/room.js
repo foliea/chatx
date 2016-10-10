@@ -12,15 +12,23 @@ class Room {
   add(chatter, options) {
     this.members.push({ id: chatter.id, nickname: options.as });
 
-    this.io.to(this.name).emit('member-joined', { nickname: chatter.nickname, at: moment() });
+    this.io.to(this.name).emit('member-joined', { nickname: options.as, at: moment() });
   }
   remove(chatter) {
+    let member = _.find(this.members, member => {
+      return member.id === chatter.id;
+    });
     _.remove(this.members, member => {
       return member.id === chatter.id;
     });
-    this.io.to(this.name).emit('member-left', { nickname: chatter.nickname, at: moment() });
+    this.io.to(this.name).emit('member-left', { nickname: member.nickname, at: moment() });
   }
-  send(message) {
+  send(message, options) {
+    let member = _.find(this.members, member => {
+      return member.id === options.from;
+    })
+    message.sender = member.nickname;
+
     this.io.to(this.name).emit('message', message);
   }
   isAuthorized(nickname) {

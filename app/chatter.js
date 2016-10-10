@@ -36,7 +36,7 @@ class Chatter {
     if (!this.activeRoom) {
       return this.error(JOIN_ROOM_ERROR);
     }
-    this.activeRoom.send(message);
+    this.activeRoom.send(message, { from: this.id });
   }
   error(content) {
     this.socket.emit('failure', content);
