@@ -238,5 +238,39 @@ describe('Room', () => {
         expect(room.isAuthorized(NICKNAME)).to.be.false;
       });
     });
+
+    describe('#isMember()', () => {
+      let id = 'dspok', nickname = 'poppy';
+
+      context('when room has a member matching both given id and nickname', () => {
+        beforeEach(() => {
+          room.members.push({ id: id, nickname: nickname });
+        });
+
+        it('returns true', () => {
+          expect(room.isMember(id, nickname)).to.be.true;
+        });
+      });
+
+      context('when room has no member matching given id', () => {
+        beforeEach(() => {
+          room.members.push({ nickname: nickname });
+        });
+
+        it('returns false', () => {
+          expect(room.isMember(id, nickname)).to.be.false;
+        });
+      });
+
+      context('when room has no member matching given nickname', () => {
+        beforeEach(() => {
+          room.members.push({ nickname: nickname });
+        });
+
+        it('returns false', () => {
+          expect(room.isMember(id, nickname)).to.be.false;
+        });
+      });
+    });
   });
 });

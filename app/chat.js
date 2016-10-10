@@ -7,7 +7,8 @@ let _ = require('lodash'),
 
 const INVALID_MESSAGE_ERROR = 'Message must be present.',
       INVALID_ROOM_ERROR    = 'Room name must be present.',
-      INVALID_NICKNAME      = "You can't join this room with this nickname."
+      INVALID_NICKNAME      = "You can't join this room with this nickname.",
+      ALREADY_IN_ROOM       = 'You already are in this room with this nickname.';
 
 
 class Chat {
@@ -30,9 +31,17 @@ class Chat {
         if (!room.isAuthorized(req.nickname)) {
           return chatter.error(INVALID_NICKNAME);
         }
+        if (room.isMember(chatter.id, req.nickname)) {
+          return chatter.error(INVALID_NICKNAME);
+        }
         chatter.join(room);
 
         room.add(chatter, { as: req.nickname.trim() })
+      });
+      socket.on('leave-room', () => {
+        if (chatter.isInARoom) { chatter.leave(); }
+
+        socket.emit('leave-room');
       });
       socket.on('message', req => {
         let message = new Message(req, chatter);

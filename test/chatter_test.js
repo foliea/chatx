@@ -91,22 +91,6 @@ describe('Chatter', () => {
         expect(chatter.socket.emit).to.have.been.calledWith('room-infos', room.infos);
       });
     });
-
-    context('when chatter was already in this room', ()=> {
-      beforeEach(() => {
-        chatter.activeRoom = { name: '/c' };
-
-        chatter.join(room);
-
-        sinon.stub(chatter, 'error');
-
-        chatter.join(room);
-      });
-
-      it('returns an error', ()=> {
-        expect(chatter.error).to.have.been.calledOnce;
-      });
-    });
   });
 
   describe('#write()', () => {

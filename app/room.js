@@ -35,6 +35,11 @@ class Room {
     return !_.isUndefined(nickname) && !_.isEmpty(nickname.trim()) &&
       nickname.trim().length <= 10 && !this._isAlreadyInUse(nickname);
   }
+  isMember(id, nickname) {
+    return !_.isUndefined(_.find(this.members, member => {
+      return member.id === id && member.nickname === nickname;
+    }));
+  }
   _isAlreadyInUse(nickname) {
     return _.find(this.members, member => {
       return member.nickname === nickname;

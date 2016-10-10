@@ -172,6 +172,33 @@ describe('Chat', () => {
     });
   });
 
+  describe('on leave-room', () => {
+    context('when client was not in a room', () => {
+      it("doesn't fail", done => {
+        client.on('leave-room', () => { done(); });
+
+        client.emit('leave-room');
+      });
+    });
+
+    context('when client was in a room', ()=> {
+      beforeEach(done => {
+        client.on('room-infos', () => { done() });
+
+        client.emit('join-room', { nickname: 'johnsnow', room: 'test' });
+      });
+
+      it('leaves the room', done => {
+        client.on('leave-room', () => {
+          expect(chat.findOrCreate('test').members).to.be.empty;
+
+          done();
+        });
+        client.emit('leave-room');
+      });
+    });
+  });
+
   describe('on disconnect', ()=> {
     context("wasn't in a room", () => {
       it("doesn't fail", done => {

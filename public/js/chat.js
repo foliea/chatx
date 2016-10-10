@@ -35,13 +35,7 @@
     this.selectors.input.nickname.focus();
 
     this.selectors.button.join.addEventListener('click', function() {
-      var req = {
-        nickname: self.selectors.input.nickname.value,
-        room:     self.selectors.input.room.value,
-      };
-      self.activeRoom = req.room;
-
-      self.client.emit('join-room', req);
+      self.client.emit('leave-room');
     });
 
     this.selectors.button.send.addEventListener('click', function() {
@@ -110,6 +104,17 @@
     this.client.on('room-infos', function(room) {
       self.loadRoom(room);
     });
+
+    this.client.on('leave-room', function() {
+      var req = {
+        nickname: self.selectors.input.nickname.value,
+        room:     self.selectors.input.room.value,
+      };
+      self.activeRoom = req.room;
+
+      self.client.emit('join-room', req);
+    });
+
     this.client.on('message', function(content) {
       self.populateChat(content);
     });
