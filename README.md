@@ -21,7 +21,7 @@ To launch the web application:
 
 The web application should now be available at the following url:
 
-        http://localhost:3000
+    http://localhost:3000
 
 ## Tests
 
