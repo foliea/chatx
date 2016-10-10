@@ -6,6 +6,10 @@
     "test": "./node_modules/.bin/mocha",
     "start": "node index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/foliea/chatx.git"
+  },
   "author": "Adrien Folie <folie.adrien@gmail.com>",
   "license": "MIT",
   "bugs": {
