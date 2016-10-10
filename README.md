@@ -37,7 +37,7 @@ To get this environment:
 
     docker run -ti -p 3000:3000 -v $PWD:/app node /bin/bash
 
-Then to get into the application directoy run:
+Then to get into the application directoy, run:
 
     cd /app
 
