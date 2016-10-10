@@ -2,7 +2,7 @@
 
 let _ = require('lodash'),
   moment = require('moment'),
-  Message = require('../app/Message');
+  Message = require('../app/message');
 
 describe('Message', () => {
   const CHATTER = { nickname: 'JohnSnow' };

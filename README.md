@@ -1,4 +1,5 @@
 # ChatX
+[![Build Status](https://travis-ci.org/foliea/chatx.svg?branch=master)](https://travis-ci.org/foliea/chatx)
 
 A simple web chat application with [Express.js](https://expressjs.com/) and
 [socket.io](http://socket.io/).
