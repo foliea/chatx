@@ -10,7 +10,6 @@ const INVALID_MESSAGE_ERROR = 'Message must be present.',
       INVALID_NICKNAME      = "You can't join this room with this nickname.",
       ALREADY_IN_ROOM       = 'You already are in this room with this nickname.';
 
-
 class Chat {
   constructor(io) {
     this.io    = io;
