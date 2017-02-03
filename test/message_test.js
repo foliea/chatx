@@ -78,7 +78,6 @@ describe('Message', () => {
       });
 
       it('returns false', () => {
-        console.log();
         expect(message.isValid).to.be.false;
       });
     });
