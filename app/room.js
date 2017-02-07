@@ -46,10 +46,10 @@ class Room {
     });
   }
   get infos() {
-    let membersNickname = _.map(this.members, member => {
+    let membersNicknames = _.map(this.members, member => {
       return member.nickname;
     });
-    return { members: membersNickname };
+    return { members: membersNicknames };
   }
   get isValid() {
     return !_.isUndefined(this.name) && !_.isEmpty(this.name.trim()) &&
