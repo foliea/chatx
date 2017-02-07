@@ -105,7 +105,7 @@ describe('Chat', () => {
         client.emit('join-room', { nickname: 'johnsnow', room: 'test' });
       });
 
-      it('send an error', () => {
+      it('sends an error', () => {
         client.on('failure', done => {
           expect(error).to.not.be.empty;
 
@@ -122,7 +122,7 @@ describe('Chat', () => {
         client.emit('message', 'test')
       });
 
-      it('send an error', done => {
+      it('sends an error', done => {
         client.on('failure', error => {
           expect(error).to.not.be.empty;
 
@@ -145,7 +145,7 @@ describe('Chat', () => {
           client.emit('message', MESSAGE)
         });
 
-        it('send a formated message to all members of a given room', done => {
+        it('sends a formated message to all members of a given room', done => {
           client.on('message', message => {
             expect(moment(message.sentAt).fromNow()).to.eq('a few seconds ago')
 
@@ -161,7 +161,7 @@ describe('Chat', () => {
           client.emit('message');
         });
 
-        it('send an error', done => {
+        it('sends an error', done => {
           client.on('failure', error => {
             expect(error).to.not.be.empty;
 
